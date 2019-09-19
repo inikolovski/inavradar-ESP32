@@ -1,6 +1,74 @@
-// 'InavRadarLogo', 128x64px
-#define logo_width_s 128
-#define logo_height_s 64
+// -------- GRAPHICS
+
+const uint8_t icon_lq_1[] PROGMEM = {
+    B00000000,
+    B00000000,
+    B00000000,
+    B00000000,
+    B00000000,
+    B00000000,
+    B00000000,
+    B00000011
+};
+
+const uint8_t icon_lq_2[] PROGMEM = {
+    B00000000,
+    B00000000,
+    B00000000,
+    B00000000,
+    B00000000,
+    B00001111,
+    B00000000,
+    B00000011
+};
+
+const uint8_t icon_lq_3[] PROGMEM = {
+    B00000000,
+    B00000000,
+    B00000000,
+    B00111111,
+    B00000000,
+    B00001111,
+    B00000000,
+    B00000011
+};
+
+const uint8_t icon_lq_4[] PROGMEM = {
+    B00000000,
+    B11111111,
+    B00000000,
+    B00111111,
+    B00000000,
+    B00001111,
+    B00000000,
+    B00000011
+};
+
+const uint8_t icon_sq0[] PROGMEM = {
+    B00000000,
+    B00000000,
+    B00000000,
+    B00000000,
+    B00000000,
+    B00000000,
+    B00000000,
+    B01010101,
+};
+
+const uint8_t icon_sq1[] PROGMEM = {
+    B00000000,
+    B00000000,
+    B01111111,
+    B01111111,
+    B01111111,
+    B01111111,
+    B01111111,
+    B01111111,
+};
+
+#define LOGO_WIDTH 128
+#define LOGO_HEIGHT 64
+
 const uint8_t logo_bits_s [] PROGMEM = {
   0xC0, 0x01, 0x00, 0x0F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x78, 0x0E, 0xC0, 0x34, 0x00, 0x04, 0x08, 0x00,

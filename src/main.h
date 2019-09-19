@@ -1,23 +1,47 @@
-#define VERSION "1.3"
+// -------- GENERAL
 
-#define MODE_HOST_SCAN   0
-#define MODE_LORA_INIT   1
-#define MODE_LORA_SYNC   2
-#define MODE_LORA_RX     3
-#define MODE_LORA_TX     4
+#define VERSION "1.4"
+#define VERSION_CONFIG 140
+#define FORCE_DEFAULT_PROFILE 1
 
+// #define USE_CLI
+// #define USE_BT
+
+#define MODE_START       0
+#define MODE_MENU        1
+#define MODE_HOST_SCAN   2
+#define MODE_LORA_INIT   3
+#define MODE_LORA_SYNC   4
+#define MODE_LORA_RX     5
+#define MODE_LORA_TX     6
+
+// -------- HOST
+
+#define HOST_MSP_TIMEOUT 4000
+#define HOST_NONE 0
+#define HOST_INAV 1
+#define HOST_BTFL 2
+
+#define CFG_PROFILE_DEFAULT_ID 1
+
+// -------- LORA
+
+#define LORA_NODES_MAX 8
 #define LORA_NAME_LENGTH 6
+
+#define LORA_CYCLE_SCAN 4000
+#define LORA_PEER_TIMEOUT 6000 // 6s
+#define LORA_PEER_TIMEOUT_LOST 30000  // 30s
+#define LORA_DRIFT_THRESHOLD 5
+#define LORA_DRIFT_CORRECTION 20
+
+// --------- IO AND DISPLAY
+
+#define DISPLAY_CYCLE 250
+#define IO_LEDBLINK_DURATION 160
 
 #define SERIAL_PIN_TX 23
 #define SERIAL_PIN_RX 17
-
-#define LORA_PERF_MODE 0
-
-#define LORA_NODES_MIN 2
-#define LORA_NODES_MAX 4
-
-#define LED 2
-#define IO_LEDBLINK_DURATION 160
 
 #define SCK 5 // GPIO5 - SX1278's SCK
 #define MISO 19 // GPIO19 - SX1278's MISO
@@ -26,13 +50,7 @@
 #define RST 14 // GPIO14 - SX1278's RESET
 #define DI0 26 // GPIO26 - SX1278's IRQ (interrupt request)
 
-#define HOST_NONE 0
-#define HOST_INAV 1
-#define HOST_BTFL 2
-
-char host_name[3][5]={"NoFC", "iNav", "Beta"};
-char host_state[2][5]={"", "ARM"};
-char peer_slotname[9][3]={"X", "A", "B", "C", "D", "E", "F", "G", "H"};
+// -------- STRUCTURE
 
 struct peer_t {
    uint8_t id;
@@ -66,76 +84,91 @@ struct curr_t {
 };
 
 struct air_type0_t { // 80 bits
-    unsigned int id : 3;
+    unsigned int id : 4;
     unsigned int type : 3;
     signed int lat : 25; // -9 000 000 to +9 000 000    -90x10e5 to +90x10e5
     signed int lon : 26; // -18 000 000 to +18 000 000   -180x10e5 to +180x10e5
-    signed int alt : 14; // -8192m to +8192m
+    unsigned int alt : 13; // 0 to +8192m
     unsigned int heading : 9; // 0 to 511°
 };
 
 struct air_type1_t { // 80 bits
-    unsigned int id : 3;
+    unsigned int id : 4;
+    unsigned int type : 3;
+    signed int lat : 25; // -9 000 000 to +9 000 000    -90x10e5 to +90x10e5
+    signed int lon : 26; // -18 000 000 to +18 000 000   -180x10e5 to +180x10e5
+    unsigned int alt : 13; // 0 to +8192m
+    unsigned int speed : 6; // 0 to 64m/s 230km/h
+    unsigned int broadcast : 3;
+};
+
+struct air_type2_t { // 80 bits
+    unsigned int id : 4;
     unsigned int type : 3;
     unsigned int host : 3;
     unsigned int state : 3;
-    unsigned int broadcast : 6;
-    unsigned int speed : 6; // 64m/s
     char name[LORA_NAME_LENGTH]; // 6 char x 8 bits = 48
-    unsigned int temp1 : 8; // Spare
+    unsigned int temp1 : 19; // Spare
     };
 
-struct air_type2_t { // 80 bits
-    unsigned int id : 3;
+struct air_type3_t { // 80 bits
+    unsigned int id : 4;
     unsigned int type : 3;
     unsigned int vbat : 8;
     unsigned int mah : 16;
     unsigned int rssi : 10;
     unsigned int temp1 : 20; // Spare
-    unsigned int temp2 : 20; // Spare
+    unsigned int temp2 : 19; // Spare
     };
 
 
 struct config_t {
+
+
+    // General
+
+    uint16_t version;
+    uint8_t profile_id;
+    char profile_name[15];
+
+    // Radio
+
     uint32_t lora_frequency;
     uint32_t lora_bandwidth;
     uint8_t lora_coding_rate;
     uint8_t lora_spreading_factor;
     uint8_t lora_power;
+
+    // Timings
+
     uint8_t lora_nodes_max;
     uint16_t lora_slot_spacing;
-    uint16_t lora_cycle;
     int16_t lora_timing_delay;
-    uint8_t lora_antidrift_threshold;
-    uint8_t lora_antidrift_correction;
-    uint16_t lora_peer_timeout;
-
-    uint8_t lora_air_mode;
-
-    uint8_t msp_version;
-    uint8_t msp_timeout;
-    uint16_t msp_fc_timeout;
     uint16_t msp_after_tx_delay;
 
-    uint16_t cycle_scan;
-    uint16_t cycle_display;
-    uint16_t cycle_stats;
+    // IO & Display
+
+    bool display_enable;
+    uint8_t io_pin_led = 2;
+
 };
 
 struct system_t {
     uint8_t phase;
 
+    uint16_t lora_cycle;
+    uint8_t lora_tick = 0;
+
     uint32_t now = 0;
     uint32_t now_sec = 0;
-
     uint8_t air_last_received_id = 0;
     int last_rssi;
+
     uint8_t pps = 0;
     uint8_t ppsc = 0;
     uint8_t num_peers = 0;
     uint8_t num_peers_active = 0;
 
-    uint8_t lora_tick;
     bool lora_no_tx = 0;
     uint8_t lora_slot = 0;
     uint32_t lora_last_tx = 0;
@@ -153,7 +186,13 @@ struct system_t {
     uint32_t io_button_released = 0;
     bool io_button_pressed = 0;
 
+    uint16_t cycle_stats;
     uint32_t cycle_scan_begin;
+
+    uint32_t menu_begin;
+    uint16_t menu_timeout = 4000;
+    uint8_t menu_line = 1;
+
     uint32_t io_led_changestate;
     uint8_t io_led_count;
     uint8_t io_led_blink;
@@ -165,57 +204,19 @@ struct system_t {
 struct stats_t {
     uint32_t timer_begin;
     uint32_t timer_end;
+
     float packets_total;
     uint32_t packets_received;
     uint8_t percent_received;
+
     uint16_t last_tx_duration;
     uint16_t last_rx_duration;
     uint16_t last_msp_duration[LORA_NODES_MAX];
     uint16_t last_oled_duration;
 };
 
-const uint8_t icon_lq_1[] PROGMEM = {
-    B00000000,
-    B00000000,
-    B00000000,
-    B00000000,
-    B00000000,
-    B00000000,
-    B00000000,
-    B00000011
-};
-
-const uint8_t icon_lq_2[] PROGMEM = {
-    B00000000,
-    B00000000,
-    B00000000,
-    B00000000,
-    B00000000,
-    B00001111,
-    B00000000,
-    B00000011
-};
-
-const uint8_t icon_lq_3[] PROGMEM = {
-    B00000000,
-    B00000000,
-    B00000000,
-    B00111111,
-    B00000000,
-    B00001111,
-    B00000000,
-    B00000011
-};
-
-const uint8_t icon_lq_4[] PROGMEM = {
-    B00000000,
-    B11111111,
-    B00000000,
-    B00111111,
-    B00000000,
-    B00001111,
-    B00000000,
-    B00000011
-};
-
-
+extern config_t cfg;
+extern system_t sys;
+extern stats_t stats;
+extern curr_t curr;
+extern peer_t peers[LORA_NODES_MAX];
