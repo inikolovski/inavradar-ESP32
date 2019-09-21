@@ -83,15 +83,18 @@ int CLI::statusCommand() {
   _stream->print("Version: ");
   _stream->println(VERSION);
   _stream->print("Name: ");
-  _stream->println(String(curr.name)); // freq
+  _stream->println(String(curr.name)); // name
   _stream->print("Profile: ");
   _stream->println(cfg.profile_id); // profile number
   _stream->print("PPS: ");
   _stream->println(sys.pps);
-  _stream->print("Peers: ");
+  _stream->print("Active Peers: ");
   _stream->println(sys.num_peers_active);
+  _stream->println("--- Slots ---");
   for (size_t i = 0; i < cfg.lora_nodes_max; i++) {
     _stream->println("---");
+    _stream->print("Name: ");
+    _stream->println(String(peers[i].name)); // name
     _stream->print("id: ");
     _stream->println(peers[i].id);
     _stream->print("host: ");
