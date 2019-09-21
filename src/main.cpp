@@ -79,7 +79,7 @@ void config_init() {
         cfg.lora_spreading_factor = 9;
         cfg.lora_power = 20;
 
-        cfg.lora_nodes_max = 4;
+        cfg.lora_nodes_max = LORA_NODES_MAX;
         cfg.lora_slot_spacing = 125;
         cfg.lora_timing_delay = -70;
         cfg.msp_after_tx_delay = 85;
