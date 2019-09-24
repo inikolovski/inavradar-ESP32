@@ -3,6 +3,7 @@
 .piolibdeps
 .clang_complete
 .gcc-flags.json
+.vscode
 .DS_Store
 src/.DS_Store
 platformio.ini

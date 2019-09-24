@@ -154,7 +154,7 @@ bool CLI::runCommand(char * commandLine) {
   char * ptrToCommandName = strtok(commandLine, delimiters);
 
   if (strcmp(ptrToCommandName, statusCommandToken) == 0) {
-    statusCommand();
+    result = statusCommand();
     if (result == 0) _stream->println("ok");
     else _stream->println("failed");
   } else if (strcmp(ptrToCommandName, rebootCommandToken) == 0) {
@@ -170,5 +170,5 @@ bool CLI::runCommand(char * commandLine) {
   } else {
       nullCommand(ptrToCommandName);
   }
-
+  return 0;
 }
