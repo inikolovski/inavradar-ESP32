@@ -155,7 +155,6 @@ set osd_hud_radar_range_max = 4000
 !!! COMMANDS ARE DISABLED IN CURRENT VERSION !!!
 
 ```
-================= Commands =================
 status                  - Show whats going on
 help                    - List all commands
 config                  - List all settings
